@@ -1,10 +1,13 @@
 from sanic import Sanic
 from sanic import response
 from sanic.exceptions import InvalidUsage
-from rapid.exception import JosnErrorHandler
-from sanic import log
+from rapid.handlers import JosnErrorHandler
+from sanic.exceptions import SanicException
+from rapid.logger import LOGGING_CONFIG
 import logging.config
-
+from rapid.models import RapidModel
+from rapid.utils import response_data
+from copy import deepcopy
 # @app.route("/")
 # async def run(request):
 #     print(request.headers)
@@ -14,16 +17,25 @@ import logging.config
 class Rapid(Sanic):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        d = log.LOGGING_CONFIG_DEFAULTS
-        d['handlers']["console"]['class'] = 'rapid.logger.InterceptHandler'
-        d['handlers']["error_console"]['class'] = 'rapid.logger.InterceptHandler'
-        d['handlers']["access_console"]['class'] = 'rapid.logger.InterceptHandler'
-        del d['handlers']["console"]["stream"]
-        del d['handlers']["error_console"]["stream"]
-        del d['handlers']["access_console"]["stream"]
-        logging.config.dictConfig(d)
-        self.error_handler = JosnErrorHandler
+        logging.config.dictConfig(LOGGING_CONFIG)
+        self.error_handler = JosnErrorHandler()
+        self.models = {}
+        self.add_route(self.predict, "/models/<name>/predict")
 
-    def register_model(self, model_class):
-        pass
+    def register_model(self, model):
+        if isinstance(model, (list, tuple)):
+            for item in model:
+                self.register_model(item)
+        elif isinstance(model, RapidModel):
+            self.models[model.name] = model
+        else:
+            SanicException(f"only RapidModel can be registered to server, got {type(model)}")
+
+    def predict(self, request, name):
+        try:
+            d = self.models[name].predict(request.json)
+        except Exception as e:
+            raise e # todo
+        return response_data(d)
+
 
