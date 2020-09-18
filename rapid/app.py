@@ -28,7 +28,8 @@ class Rapid(Sanic):
             cls = self.model_classes.get(model["class"], None)
             if cls is None:
                 raise SanicException(f"not found model class named {model['class']}", 400)
-            obj = cls(name=model["name"], model_path=model["model_path"])
+            model.pop("class")
+            obj = cls(**model)
             self.register_model(obj)
 
     def register_model_class(self, model_class):
@@ -51,7 +52,7 @@ class Rapid(Sanic):
 
     def predict(self, request, name):
         try:
-            d = self.models[name].predict(request.json)
+            d = self.models[name].predict(request.json["instances"])
         except Exception as e:
             raise e # todo
         return response_data(d)
