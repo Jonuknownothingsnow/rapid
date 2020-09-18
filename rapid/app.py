@@ -7,12 +7,7 @@ from rapid.logger import LOGGING_CONFIG
 import logging.config
 from rapid.models import RapidModel
 from rapid.utils import response_data
-from copy import deepcopy
-# @app.route("/")
-# async def run(request):
-#     print(request.headers)
-#     return response.text("ok")
-
+import json
 
 class Rapid(Sanic):
     def __init__(self, *args, **kwargs):
@@ -20,7 +15,30 @@ class Rapid(Sanic):
         logging.config.dictConfig(LOGGING_CONFIG)
         self.error_handler = JosnErrorHandler()
         self.models = {}
+        self.model_classes = {}
         self.add_route(self.predict, "/models/<name>/predict")
+
+    def load_config(self, config_path):
+        with open(config_path, "r") as f:
+            config = json.load(f)
+        self.load_models_from_config(config["models"])
+
+    def load_models_from_config(self, models):
+        for model in models:
+            cls = self.model_classes.get(model["class"], None)
+            if cls is None:
+                raise SanicException(f"not found model class named {model['class']}", 400)
+            obj = cls(name=model["name"], model_path=model["model_path"])
+            self.register_model(obj)
+
+    def register_model_class(self, model_class):
+        if isinstance(model_class, (list, tuple)):
+            for item in model_class:
+                self.register_model_class(model_class)
+        elif issubclass(model_class, RapidModel):
+            self.model_classes[model_class.__name__] = model_class
+        else:
+            SanicException(f"only RapidModel can be registered to server, got {type(model_class)}")
 
     def register_model(self, model):
         if isinstance(model, (list, tuple)):
@@ -29,7 +47,7 @@ class Rapid(Sanic):
         elif isinstance(model, RapidModel):
             self.models[model.name] = model
         else:
-            SanicException(f"only RapidModel can be registered to server, got {type(model)}")
+            SanicException(f"only RapidModel can be registered to server, got {type(model)}") # todo
 
     def predict(self, request, name):
         try:
@@ -37,5 +55,9 @@ class Rapid(Sanic):
         except Exception as e:
             raise e # todo
         return response_data(d)
+
+    def model_info(self, request, name):
+        # todo
+        pass
 
 
