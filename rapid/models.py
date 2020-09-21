@@ -14,7 +14,7 @@ class RapidModel(object):
     def predict(self, inputs):
         raise NotImplementedError("predict function is not implemented")
 
-    def info(self):
+    def to_dict(self):
         return {
             "name":self.name,
             "model_path":self.model_path,

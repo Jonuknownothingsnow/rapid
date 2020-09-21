@@ -1,9 +1,9 @@
-from sanic.exceptions import SanicException
+from sanic.exceptions import SanicException, InvalidUsage
 
 class RapidException(SanicException):
     pass
 
-class ModelNotExists(RapidException):
+class ModelNotExists(InvalidUsage):
     pass
 
 class ModelPredictError(RapidException):

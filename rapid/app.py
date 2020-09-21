@@ -1,13 +1,13 @@
 from sanic import Sanic
-from sanic import response
-from sanic.exceptions import InvalidUsage
-from rapid.handlers import JosnErrorHandler
-from sanic.exceptions import SanicException
+from sanic.exceptions import SanicException, InvalidUsage
 from rapid.logger import LOGGING_CONFIG
 import logging.config
+import json
+
 from rapid.models import RapidModel
 from rapid.utils import response_data
-import json
+from rapid.handlers import JosnErrorHandler
+from rapid.exceptions import ModelNotExists
 
 class Rapid(Sanic):
     def __init__(self, *args, **kwargs):
@@ -16,7 +16,8 @@ class Rapid(Sanic):
         self.error_handler = JosnErrorHandler()
         self.models = {}
         self.model_classes = {}
-        self.add_route(self.predict, "/models/<name>/predict")
+        self.add_route(self.predict, "/models/<name>/predict", methods=["POST"])
+        self.add_route(self.model_info, "/models/<name>/info")
 
     def load_config(self, config_path):
         with open(config_path, "r") as f:
@@ -58,7 +59,10 @@ class Rapid(Sanic):
         return response_data(d)
 
     def model_info(self, request, name):
-        # todo
-        pass
+        model = self.models.get(name, None)
+        if model is None:
+            raise ModelNotExists(name)
+        else:
+            return response_data(model.to_dict())
 
 
