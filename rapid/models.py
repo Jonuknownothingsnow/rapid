@@ -5,7 +5,7 @@ class RapidModel(object):
         self.name = name
         self.model_path = model_path
         self.params = kwargs
-        self.model = self.load()
+        self.load()
         self.update_time = datetime.datetime.now()
 
     def load(self):

@@ -1,8 +1,3 @@
-## Rapid
-
-
-
-```python
 import torch
 from rapid import Rapid, models
 from transformers import AutoTokenizer, AutoModel, BertTokenizer
@@ -24,7 +19,4 @@ app = Rapid("trans")
 app.register_model(TransModel(name="albert", model_path="voidful/albert_chinese_tiny"))
 app.run(port=8088)
 
-
-
-```
 

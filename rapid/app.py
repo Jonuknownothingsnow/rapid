@@ -3,11 +3,13 @@ from sanic.exceptions import SanicException, InvalidUsage
 from rapid.logger import LOGGING_CONFIG
 import logging.config
 import json
+from sanic import response
 
 from rapid.models import RapidModel
 from rapid.utils import response_data
 from rapid.handlers import JosnErrorHandler
 from rapid.exceptions import ModelNotExists
+from rapid.logger import logger
 
 class Rapid(Sanic):
     def __init__(self, *args, **kwargs):
@@ -48,6 +50,7 @@ class Rapid(Sanic):
                 self.register_model(item)
         elif isinstance(model, RapidModel):
             self.models[model.name] = model
+            logger.info(f"success load model '{model.name}' {type(model)}")
         else:
             SanicException(f"only RapidModel can be registered to server, got {type(model)}") # todo
 
