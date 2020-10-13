@@ -12,6 +12,7 @@ INTERNAL_SERVER_ERROR_HTML = """
     </p>
 """
 
+
 class JosnErrorHandler(ErrorHandler):
     def default(self, request, exception):
         """
@@ -38,11 +39,11 @@ class JosnErrorHandler(ErrorHandler):
         logger.exception(response_message, url)
 
         if issubclass(type(exception), SanicException):
-            d = {"err":"Error: {}".format(exception), "msg":"", "success":False}
+            d = {"err": "Error: {}".format(exception), "msg": "", "success": False}
             return response.json(
                 d,
-                status = getattr(exception, "status_code", 500),
-                headers = getattr(exception, "headers", dict()),
+                status=getattr(exception, "status_code", 500),
+                headers=getattr(exception, "headers", dict()),
             )
         elif self.debug:
             html_output = self._render_traceback_html(exception, request)

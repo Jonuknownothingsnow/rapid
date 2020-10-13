@@ -11,6 +11,7 @@ from rapid.handlers import JosnErrorHandler
 from rapid.exceptions import ModelNotExists
 from rapid.logger import logger
 
+
 class Rapid(Sanic):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -19,7 +20,6 @@ class Rapid(Sanic):
         self.models = {}
         self.model_classes = {}
         self.set_default_routes()
-
 
     def load_config(self, config_path):
         with open(config_path, "r") as f:
@@ -30,7 +30,9 @@ class Rapid(Sanic):
         for model in models:
             cls = self.model_classes.get(model["class"], None)
             if cls is None:
-                raise SanicException(f"not found model class named {model['class']}", 400)
+                raise SanicException(
+                    f"not found model class named {model['class']}", 400
+                )
             model.pop("class")
             obj = cls(**model)
             self.register_model(obj)
@@ -42,7 +44,9 @@ class Rapid(Sanic):
         elif issubclass(model_class, RapidModel):
             self.model_classes[model_class.__name__] = model_class
         else:
-            SanicException(f"only RapidModel can be registered to server, got {type(model_class)}")
+            SanicException(
+                f"only RapidModel can be registered to server, got {type(model_class)}"
+            )
 
     def register_model(self, model):
         if isinstance(model, (list, tuple)):
@@ -52,13 +56,15 @@ class Rapid(Sanic):
             self.models[model.name] = model
             logger.info(f"success load model '{model.name}' {type(model)}")
         else:
-            SanicException(f"only RapidModel can be registered to server, got {type(model)}") # todo
+            SanicException(
+                f"only RapidModel can be registered to server, got {type(model)}"
+            )  # todo
 
     def predict(self, request, name):
         try:
             d = self.models[name].predict(request.json["instances"])
         except Exception as e:
-            raise e # todo
+            raise e  # todo
         return response_data(d)
 
     def model_info(self, request, name):
@@ -76,12 +82,10 @@ class Rapid(Sanic):
         try:
             d = self.models[name].valid(instances, labels, return_detail)
         except Exception as e:
-            raise e # todo
+            raise e  # todo
         return response_data(d)
 
     def set_default_routes(self):
         self.add_route(self.predict, "/models/<name>/predict", methods=["POST"])
         self.add_route(self.valid, "/models/<name>/valid", methods=["POST"])
         self.add_route(self.model_info, "/models/<name>/info")
-
-

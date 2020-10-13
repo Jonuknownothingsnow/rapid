@@ -62,7 +62,11 @@ class InterceptHandler(logging.Handler):
 
 
 logging.basicConfig(handlers=[InterceptHandler()], level=0)
-logger.configure(handlers=[{"sink": sys.stderr, "level": 'INFO'}])  # 配置日志到标准输出流
+logger.configure(handlers=[{"sink": sys.stderr, "level": "INFO"}])  # 配置日志到标准输出流
 logger.add(
-    f"{log_path}/{date}.log", rotation="100 MB", encoding='utf-8', colorize=False, level='INFO'
+    f"{log_path}/{date}.log",
+    rotation="100 MB",
+    encoding="utf-8",
+    colorize=False,
+    level="INFO",
 )  # 配置日志到输出到文件

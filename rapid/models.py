@@ -1,5 +1,6 @@
 import datetime
 
+
 class RapidModel(object):
     def __init__(self, name, model_path, **kwargs):
         self.name = name
@@ -18,20 +19,19 @@ class RapidModel(object):
         y_pre = self.predict(inputs)
         metrics = self.metrics(y_pre, labels)
         if return_detail:
-            return {"predictions":y_pre, "labels":labels, "metrics":metrics}
+            return {"predictions": y_pre, "labels": labels, "metrics": metrics}
         else:
-            return {"metrics":metrics}
-
+            return {"metrics": metrics}
 
     def metrics(self, y_pre, y):
         raise NotImplementedError("predict function is not implemented")
 
     def to_dict(self):
         return {
-            "name":self.name,
-            "model_path":self.model_path,
-            "params":self.params,
-            "update_time":self.update_time
+            "name": self.name,
+            "model_path": self.model_path,
+            "params": self.params,
+            "update_time": self.update_time,
         }
 
 
