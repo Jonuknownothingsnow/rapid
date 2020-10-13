@@ -17,8 +17,8 @@ def test_hello(app):
     assert response.status == 200
 
 def test_register_model(app):
-    dm = HelloModel(name="dummy")
+    dm = HelloModel(name="dummy", model_path="")
     app.register_model(dm)
-    _, response = app.test_client.get("/models/dummy/predict")
+    _, response = app.test_client.post("/models/dummy/predict", json={"instances":["aaa"]})
     assert response.status == 200
     assert response.json["data"] == "Hello dummy"
