@@ -14,6 +14,18 @@ class RapidModel(object):
     def predict(self, inputs):
         raise NotImplementedError("predict function is not implemented")
 
+    def valid(self, inputs, labels, return_detail=False):
+        y_pre = self.predict(inputs)
+        metrics = self.metrics(y_pre, labels)
+        if return_detail:
+            return {"predictions":y_pre, "labels":labels, "metrics":metrics}
+        else:
+            return {"metrics":metrics}
+
+
+    def metrics(self, y_pre, y):
+        raise NotImplementedError("predict function is not implemented")
+
     def to_dict(self):
         return {
             "name":self.name,

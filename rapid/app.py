@@ -18,8 +18,8 @@ class Rapid(Sanic):
         self.error_handler = JosnErrorHandler()
         self.models = {}
         self.model_classes = {}
-        self.add_route(self.predict, "/models/<name>/predict", methods=["POST"])
-        self.add_route(self.model_info, "/models/<name>/info")
+        self.set_default_routes()
+
 
     def load_config(self, config_path):
         with open(config_path, "r") as f:
@@ -67,5 +67,21 @@ class Rapid(Sanic):
             raise ModelNotExists(name)
         else:
             return response_data(model.to_dict())
+
+    def valid(self, request, name):
+
+        instances = request.json.get("instances", [])
+        labels = request.json.get("labels", [])
+        return_detail = request.args.get("return_detail", False)
+        try:
+            d = self.models[name].valid(instances, labels, return_detail)
+        except Exception as e:
+            raise e # todo
+        return response_data(d)
+
+    def set_default_routes(self):
+        self.add_route(self.predict, "/models/<name>/predict", methods=["POST"])
+        self.add_route(self.valid, "/models/<name>/valid", methods=["POST"])
+        self.add_route(self.model_info, "/models/<name>/info")
 
 
