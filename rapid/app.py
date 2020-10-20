@@ -38,6 +38,11 @@ class Rapid(Sanic):
             self.register_model(obj)
 
     def register_model_class(self, model_class):
+        """
+        Register model class to app
+
+        :param model_class: class inherit from RapidModel
+        """
         if isinstance(model_class, (list, tuple)):
             for item in model_class:
                 self.register_model_class(model_class)
@@ -49,6 +54,11 @@ class Rapid(Sanic):
             )
 
     def register_model(self, model):
+        """
+        Register single model
+
+        :param model: model instance
+        """
         if isinstance(model, (list, tuple)):
             for item in model:
                 self.register_model(item)
@@ -59,6 +69,11 @@ class Rapid(Sanic):
             SanicException(
                 f"only RapidModel can be registered to server, got {type(model)}"
             )  # todo
+
+
+    # -------------------------------------------------------------------- #
+    # Model calls
+    # -------------------------------------------------------------------- #
 
     def predict(self, request, name):
         try:
