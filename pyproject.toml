@@ -17,7 +17,7 @@ homepage = "https://github.com/python-poetry/poetry"
 keywords = ['packaging', 'rapid']
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.6"
 toml = "^0.9"
 sanic = { version = "^20.6.3"}
 loguru = { version = "^0.5.1"}
