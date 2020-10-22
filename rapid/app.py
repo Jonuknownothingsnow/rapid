@@ -70,7 +70,6 @@ class Rapid(Sanic):
                 f"only RapidModel can be registered to server, got {type(model)}"
             )  # todo
 
-
     # -------------------------------------------------------------------- #
     # Model calls
     # -------------------------------------------------------------------- #
@@ -90,10 +89,15 @@ class Rapid(Sanic):
             return response_data(model.to_dict())
 
     def valid(self, request, name):
-
         instances = request.json.get("instances", [])
         labels = request.json.get("labels", [])
         return_detail = request.args.get("return_detail", False)
+        if return_detail not in ["true", "True", "1"]:
+            return_detail = False
+        else:
+            return_detail = True
+
+
         try:
             d = self.models[name].valid(instances, labels, return_detail)
         except Exception as e:
